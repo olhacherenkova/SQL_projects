@@ -1,0 +1,29 @@
+SELECT s.date,
+  s.ga_session_id,
+  sp.continent,
+  sp.country,
+  sp.device,
+  sp.browser,
+  sp.mobile_model_name,
+  sp.operating_system,
+  sp.language,
+  sp.medium,
+  sp.channel,
+  ass.account_id,
+  acc.is_verified,
+  acc.is_unsubscribed,
+  p.category,
+  p.name,
+  p.price,
+  p.short_description
+FROM `data-analytics-mate.DA.session` s
+LEFT JOIN `data-analytics-mate.DA.session_params` sp
+ON s.ga_session_id = sp.ga_session_id
+LEFT JOIN `data-analytics-mate.DA.account_session` ass
+ON s.ga_session_id = ass.ga_session_id
+LEFT JOIN `data-analytics-mate.DA.account` acc
+ON ass.account_id = acc.id
+LEFT JOIN `data-analytics-mate.DA.order` o
+ON s.ga_session_id = o.ga_session_id
+LEFT JOIN `data-analytics-mate.DA.product` p
+ON o.item_id = p.item_id
