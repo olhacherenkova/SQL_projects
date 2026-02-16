@@ -1,0 +1,21 @@
+WITH t1 AS (SELECT
+ es.id_account,
+    DATE_TRUNC(DATE_ADD(ses.date, INTERVAL es.sent_date DAY), MONTH) AS sent_month,
+    COUNT (es.id_message) OVER (PARTITION BY es.id_account,DATE_TRUNC(DATE_ADD(ses.date, INTERVAL es.sent_date DAY), MONTH)) AS sent_message_cnt,
+    MIN (DATE_ADD(ses.date, INTERVAL es.sent_date DAY)) OVER (PARTITION BY es.id_account, DATE_TRUNC(DATE_ADD(ses.date, INTERVAL es.sent_date DAY), MONTH) ) AS first_sent_date,
+    MAX (DATE_ADD(ses.date, INTERVAL es.sent_date DAY)) OVER (PARTITION BY es.id_account, DATE_TRUNC(DATE_ADD(ses.date, INTERVAL es.sent_date DAY), MONTH) ) AS last_sent_date,
+    COUNT (es.id_message) OVER (PARTITION BY DATE_TRUNC(DATE_ADD(ses.date, INTERVAL es.sent_date DAY), MONTH)) AS sent_message_cnt_all
+FROM `DA.email_sent` es
+JOIN `DA.account_session` acc
+ON es.id_account=acc.account_id
+JOIN `DA.session` ses
+ON acc.ga_session_id = ses.ga_session_id)
+--
+SELECT distinct sent_month,
+id_account,
+sent_message_cnt/
+sent_message_cnt_all *100 AS sent_msg_percent_from_this_month ,
+first_sent_date,
+last_sent_date
+FROM t1
+ORDER BY sent_month DESC, id_account
