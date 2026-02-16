@@ -1,4 +1,4 @@
-SELECT s.date,
+  SELECT s.date,
   s.ga_session_id,
   sp.continent,
   sp.country,
